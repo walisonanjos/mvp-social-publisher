@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabaseClient'
 import type { Session } from '@supabase/supabase-js'
+import UploadForm from './UploadForm';  
 
 export default function Auth() {
   const [session, setSession] = useState<Session | null>(null)
@@ -89,12 +90,12 @@ export default function Auth() {
     )
   }
 
-  // Se houver uma sessão (usuário logado), mostra a mensagem de boas-vindas
-  return (
-    <div>
-      <h2>Bem-vindo(a), {session.user.email}!</h2>
-      <p>Você está logado.</p>
-      <button onClick={handleSignOut}>Sair</button>
-    </div>
-  )
-}
+ // Se houver uma sessão (usuário logado), mostra a mensagem de boas-vindas
+return (
+  <div>
+    <h2>Bem-vindo(a), {session.user.email}!</h2>
+    <button onClick={handleSignOut}>Sair</button>
+    <hr />
+    <UploadForm /> {/* <<<--- ADICIONE O NOVO COMPONENTE AQUI */}
+  </div>
+)
