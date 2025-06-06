@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabaseClient'
 import type { Session } from '@supabase/supabase-js'
-import UploadForm from './UploadForm';  
+import UploadForm from './UploadForm'; // Linha corrigida, sem caracteres extras
 
 export default function Auth() {
   const [session, setSession] = useState<Session | null>(null)
@@ -11,7 +11,6 @@ export default function Auth() {
   const [password, setPassword] = useState('')
   const supabase = createClient()
 
-  // useEffect para verificar a sessão do usuário quando o componente carrega
   useEffect(() => {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -19,14 +18,12 @@ export default function Auth() {
     }
     getSession()
 
-    // Listener para mudanças no estado de autenticação (login, logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
 
-    // Limpa o listener quando o componente é desmontado
     return () => subscription.unsubscribe()
-  }, []) // A dependência pode ser vazia, pois supabase.auth não muda.
+  }, [])
 
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -45,7 +42,6 @@ export default function Auth() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
-      // A tela vai atualizar automaticamente por causa do listener onAuthStateChange
     } catch (error) {
       alert('Erro no login: ' + (error as Error).message)
     }
@@ -53,13 +49,12 @@ export default function Auth() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    // A tela vai atualizar automaticamente
   }
 
-  // Se não houver sessão (usuário não logado), mostra o formulário
+  // Se não houver sessão, mostra o formulário de login/cadastro
   if (!session) {
     return (
-      <div> {/* <<< CORREÇÃO AQUI: Um único div que engloba tudo */}
+      <div>
         <form>
           <label htmlFor="email">Email</label>
           <input
@@ -90,12 +85,13 @@ export default function Auth() {
     )
   }
 
- // Se houver uma sessão (usuário logado), mostra a mensagem de boas-vindas
-return (
-  <div>
-    <h2>Bem-vindo(a), {session.user.email}!</h2>
-    <button onClick={handleSignOut}>Sair</button>
-    <hr />
-    <UploadForm /> {/* <<<--- ADICIONE O NOVO COMPONENTE AQUI */}
-  </div>
-)
+  // Se houver sessão, mostra a área do usuário logado
+  return (
+    <div>
+      <h2>Bem-vindo(a), {session.user.email}!</h2>
+      <button onClick={handleSignOut}>Sair</button>
+      <hr />
+      <UploadForm />
+    </div>
+  )
+}
