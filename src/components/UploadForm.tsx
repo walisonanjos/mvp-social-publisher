@@ -65,7 +65,7 @@ export default function UploadForm() {
           />
         </div>
         <button type="submit" disabled={isUploading}>
-          {isUploading ? 'Enviando...' : 'Fazer Upload'}git add .
+          {isUploading ? 'Enviando...' : 'Fazer Upload'}
         </button>
       </form>
     </div>
