@@ -1,26 +1,34 @@
-// ARQUIVO: src/app/api/upload/route.ts
-
 import { NextResponse } from 'next/server';
+import { v2 as cloudinary } from 'cloudinary';
 
-// A linha abaixo desliga a regra de "variável não usada" apenas para a linha seguinte.
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function POST(_request: Request) {
-  console.log("--- INICIANDO DEBUG DE VARIÁVEIS DE AMBIENTE ---");
+export async function POST(request: Request) {
+  const formData = await request.formData();
+  const file = formData.get('file') as File;
 
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (!file) {
+    return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
+  }
 
-  console.log("Verificando NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:", cloudName ? `Encontrado (tamanho: ${cloudName.length})` : 'NÃO ENCONTRADO ou VAZIO');
-  console.log("Verificando NEXT_PUBLIC_CLOUDINARY_API_KEY:", apiKey ? `Encontrado (tamanho: ${apiKey.length})` : 'NÃO ENCONTRADO ou VAZIO');
-  console.log("Verificando CLOUDINARY_API_SECRET:", apiSecret ? `Encontrado (tamanho: ${apiSecret.length})` : 'NÃO ENCONTRADO ou VAZIO');
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-  console.log("--- FIM DO DEBUG DE VARIÁVEIS DE AMBIENTE ---");
+    const response = await cloudinary.uploader.upload(`data:${file.type};base64,${buffer.toString('base64')}`, {
+      resource_type: 'video',
+      folder: 'social_videos',
+    });
 
-  return NextResponse.json({
-    message: "Debug de variáveis de ambiente concluído. Verifique os logs da função na Vercel.",
-    cloudNameExists: !!cloudName,
-    apiKeyExists: !!apiKey,
-    apiSecretExists: !!apiSecret,
-  }, { status: 200 });
+    return NextResponse.json({ url: response.secure_url });
+
+  } catch (error) {
+    console.error("ERRO NO UPLOAD REAL:", error);
+    return NextResponse.json({ error: "Erro ao fazer upload do arquivo." }, { status: 500 });
+  }
 }
