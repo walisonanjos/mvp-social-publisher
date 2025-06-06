@@ -23,7 +23,7 @@ export default function Auth() {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [supabase.auth])
 
 
   const handleSignUp = async (e: React.FormEvent) => {

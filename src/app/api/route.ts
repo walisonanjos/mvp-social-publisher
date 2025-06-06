@@ -1,5 +1,8 @@
+// ARQUIVO: src/app/api/upload/route.ts
+
 import { NextResponse } from 'next/server';
-export async function POST(request: Request) {
+
+export async function POST(_request: Request) { // <<< MUDANÇA AQUI
   console.log("--- INICIANDO DEBUG DE VARIÁVEIS DE AMBIENTE ---");
 
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -11,9 +14,7 @@ export async function POST(request: Request) {
   console.log("Verificando CLOUDINARY_API_SECRET:", apiSecret ? `Encontrado (tamanho: ${apiSecret.length})` : 'NÃO ENCONTRADO ou VAZIO');
 
   console.log("--- FIM DO DEBUG DE VARIÁVEIS DE AMBIENTE ---");
-
-  // Apenas para este teste, vamos retornar uma resposta de sucesso controlada.
-  // Isso evita o erro "Unexpected end of JSON input" no frontend.
+  
   return NextResponse.json({
     message: "Debug de variáveis de ambiente concluído. Verifique os logs da função na Vercel.",
     cloudNameExists: !!cloudName,
