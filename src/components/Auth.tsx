@@ -25,7 +25,7 @@ export default function Auth() {
 
     // Limpa o listener quando o componente é desmontado
     return () => subscription.unsubscribe()
-  }, [supabase.auth])
+  }, []) // A dependência pode ser vazia, pois supabase.auth não muda.
 
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -58,36 +58,36 @@ export default function Auth() {
   // Se não houver sessão (usuário não logado), mostra o formulário
   if (!session) {
     return (
-      <div></div>
-          <form>
-<label htmlFor="email">Email</label>
-<input
-id="email"
-type="email"
-value={email}
-onChange={(e) => setEmail(e.target.value)}
-placeholder="seu@email.com"
+      <div> {/* <<< CORREÇÃO AQUI: Um único div que engloba tudo */}
+        <form>
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
             required
-/>
-           <label htmlFor="password">Senha</label>
-<input
-id="password"
-type="password"
-value={password}
-onChange={(e) => setPassword(e.target.value)}
-placeholder="••••••••"
-required
-/>
-<button type="submit" onClick={handleSignIn}>
-Entrar
-</button>
-<button type="submit" onClick={handleSignUp}>
-Cadastrar
-</button>
-</form>
-</div>
-)
-}
+          />
+          <label htmlFor="password">Senha</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+          />
+          <button type="submit" onClick={handleSignIn}>
+            Entrar
+          </button>
+          <button type="submit" onClick={handleSignUp}>
+            Cadastrar
+          </button>
+        </form>
+      </div>
+    )
+  }
 
   // Se houver uma sessão (usuário logado), mostra a mensagem de boas-vindas
   return (
@@ -98,4 +98,3 @@ Cadastrar
     </div>
   )
 }
-```
