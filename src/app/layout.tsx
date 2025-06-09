@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MVP Social Publisher",
-  description: "Sua plataforma de agendamento de posts.",
+  title: "MVP Teste",
+  description: "Teste de deploy",
 };
 
 export default function RootLayout({
