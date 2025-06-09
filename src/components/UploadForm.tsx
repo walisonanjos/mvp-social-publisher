@@ -4,7 +4,14 @@ import { useState } from 'react';
 
 export default function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false); // Estado para controlar o loading
+  const [isUploading, setIsUploading] = useState(false);
+
+  // IMPORTANTE: Substitua 'SEU_UPLOAD_PRESET' pelo nome do seu upload preset
+  // que você criou no Cloudinary. E 'SEU_CLOUD_NAME' pela variável de ambiente.
+  const UPLOAD_PRESET = 'zupltfoo'; // <<< MUDANÇA FEITA
+  const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -18,16 +25,20 @@ export default function UploadForm() {
       alert('Por favor, selecione um arquivo primeiro.');
       return;
     }
+    if (!UPLOAD_PRESET || UPLOAD_PRESET === 'SEU_UPLOAD_PRESET') {
+      alert('Erro de configuração: Por favor, defina o UPLOAD_PRESET no código.');
+      return;
+    }
 
-    setIsUploading(true); // Desabilita o botão
+    setIsUploading(true);
 
-    // Cria um objeto FormData para enviar o arquivo
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('upload_preset', UPLOAD_PRESET); // Adiciona o preset na requisição
 
     try {
-      // Envia a requisição para a nossa API Route
-      const response = await fetch('/api/upload', {
+      // Envia a requisição DIRETAMENTE para a API do Cloudinary
+      const response = await fetch(UPLOAD_URL, {
         method: 'POST',
         body: formData,
       });
@@ -35,18 +46,16 @@ export default function UploadForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        // Se a resposta não for OK, lança um erro com a mensagem do backend
-        throw new Error(data.error || 'Falha no upload.');
+        throw new Error(data.error.message || 'Falha no upload.');
       }
 
-      // Se tudo deu certo, mostra a URL do vídeo retornado pelo backend
-      alert(`Upload bem-sucedido! URL do vídeo: ${data.url}`);
+      alert(`Upload bem-sucedido! URL do vídeo: ${data.secure_url}`);
       
     } catch (error) {
       console.error('Erro no processo de upload:', error);
       alert('Erro ao fazer upload: ' + (error as Error).message);
     } finally {
-      setIsUploading(false); // Reabilita o botão, independentemente do resultado
+      setIsUploading(false);
     }
   };
 
@@ -61,7 +70,7 @@ export default function UploadForm() {
             type="file"
             accept="video/*"
             onChange={handleFileChange}
-            disabled={isUploading} // Desabilita o input durante o upload
+            disabled={isUploading}
           />
         </div>
         <button type="submit" disabled={isUploading}>
