@@ -10,7 +10,7 @@ export default function UploadForm() {
   const [isLoading, setIsLoading] = useState(false);
   
   // Suas constantes (ajuste o CLOUD_NAME e UPLOAD_PRESET se necessário)
-  const UPLOAD_PRESET = 'zupfifox'; // Seu preset não-assinado do Cloudinary
+  const UPLOAD_PRESET = 'zupltfoo';
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME; // Certifique-se que esta variável de ambiente está configurada na Netlify/Vercel
   const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
   
