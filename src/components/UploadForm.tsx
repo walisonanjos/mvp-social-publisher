@@ -6,9 +6,7 @@ export default function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // IMPORTANTE: Substitua 'SEU_UPLOAD_PRESET' pelo nome do seu upload preset
-  // que você criou no Cloudinary. E 'SEU_CLOUD_NAME' pela variável de ambiente.
-  const UPLOAD_PRESET = 'zupltfoo'; // <<< MUDANÇA FEITA
+  const UPLOAD_PRESET = 'zupltfoo'; // Corretamente definido!
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
 
@@ -25,19 +23,15 @@ export default function UploadForm() {
       alert('Por favor, selecione um arquivo primeiro.');
       return;
     }
-    if (!UPLOAD_PRESET || UPLOAD_PRESET === 'SEU_UPLOAD_PRESET') {
-      alert('Erro de configuração: Por favor, defina o UPLOAD_PRESET no código.');
-      return;
-    }
+    // O bloco de verificação foi removido daqui.
 
     setIsUploading(true);
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', UPLOAD_PRESET); // Adiciona o preset na requisição
+    formData.append('upload_preset', UPLOAD_PRESET);
 
     try {
-      // Envia a requisição DIRETAMENTE para a API do Cloudinary
       const response = await fetch(UPLOAD_URL, {
         method: 'POST',
         body: formData,
