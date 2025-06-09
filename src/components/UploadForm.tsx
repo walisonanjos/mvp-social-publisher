@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabaseClient'; // 1. IMPORTAMOS NOSSO HELPER
+import VideoList from '@/components/VideoList';
 
 export default function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
@@ -13,6 +14,16 @@ export default function UploadForm() {
   const UPLOAD_PRESET = 'zupltfoo';
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME; // Certifique-se que esta variável de ambiente está configurada na Netlify/Vercel
   const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
+  <div>
+  {/* ... sua mensagem de boas-vindas ... */}
+
+  <h3>Enviar novo vídeo</h3>
+  <UploadForm />
+
+  <hr style={{ margin: '2rem 0' }} />
+
+  <VideoList />
+</div>
   
   // Instância do cliente Supabase
   const supabase = createClient();
