@@ -8,7 +8,7 @@ export default function UploadForm() {
 
   // IMPORTANTE: Substitua 'SEU_UPLOAD_PRESET' pelo nome do seu upload preset
   // que você criou no Cloudinary. E 'SEU_CLOUD_NAME' pela variável de ambiente.
-  const UPLOAD_PRESET = 'SEU_UPLOAD_PRESET'; // <<< MUDE AQUI
+  const UPLOAD_PRESET = 'zupltfoo'; // <<< MUDANÇA FEITA
   const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`;
 
