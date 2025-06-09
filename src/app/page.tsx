@@ -1,5 +1,10 @@
-export default function HomePage() {
+import Auth from '@/components/Auth';
+
+export default function Home() {
   return (
-    <h1>Funciona!</h1>
+    <main style={{ padding: '20px' }}>
+      <h1>Minha Plataforma de Posts</h1>
+      <Auth />
+    </main>
   );
-}
+} 
