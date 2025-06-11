@@ -5,12 +5,10 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabaseClient';
 
-// Define o tipo das "props" que o componente aceita
 type UploadFormProps = {
   onUploadSuccess: () => void;
 };
 
-// Objeto para os alvos das redes sociais
 const initialTargets = {
   instagram: false,
   facebook: false,
@@ -19,13 +17,16 @@ const initialTargets = {
   kwai: false,
 };
 
+// --- MUDANÇA PRINCIPAL AQUI ---
+// Definimos os horários fixos
+const timeSlots = ['09:00', '11:00', '13:00', '15:00', '17:00'];
+
 export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
-  // Estados para todos os nossos novos campos
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [scheduleDate, setScheduleDate] = useState('');
-  const [scheduleTime, setScheduleTime] = useState('');
+  const [scheduleTime, setScheduleTime] = useState(''); // O estado continua o mesmo
   const [socialTargets, setSocialTargets] = useState(initialTargets);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,12 +46,11 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
   
   const handleUpload = async () => {
     if (!file || !scheduleDate || !scheduleTime) {
-      alert('Por favor, selecione um arquivo e uma data/hora de agendamento.');
+      alert('Por favor, selecione um arquivo, uma data e uma hora de agendamento.');
       return;
     }
     setIsLoading(true);
 
-    // Combina data e hora em um formato ISO que o Supabase entende
     const scheduled_at = new Date(`${scheduleDate}T${scheduleTime}`).toISOString();
     
     const formData = new FormData();
@@ -58,17 +58,14 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
     formData.append('upload_preset', UPLOAD_PRESET);
 
     try {
-      // 1. UPLOAD PARA O CLOUDINARY
       const cloudinaryResponse = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
       const cloudinaryData = await cloudinaryResponse.json();
       const videoUrl = cloudinaryData.secure_url;
       if (!videoUrl) throw new Error('Falha no upload para o Cloudinary.');
 
-      // 2. PEGA O USUÁRIO ATUAL
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado.');
 
-      // 3. INSERE NA TABELA 'videos' com TODOS OS NOVOS DADOS
       const { error: supabaseError } = await supabase
         .from('videos')
         .insert([{ 
@@ -85,7 +82,6 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
         }]);
       if (supabaseError) throw supabaseError;
 
-      // 4. SUCESSO E AVISA O "PAI"
       alert('Sucesso! Seu vídeo foi agendado.');
       onUploadSuccess();
 
@@ -94,7 +90,6 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
       alert('Ocorreu um erro: ' + (error as Error).message);
     } finally {
       setIsLoading(false);
-      // Limpa o formulário
       setFile(null);
       setTitle('');
       setDescription('');
@@ -104,7 +99,6 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
     }
   };
 
-  // JSX ATUALIZADO COM OS NOVOS CAMPOS
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
       <div>
@@ -126,7 +120,18 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
         </div>
         <div>
           <label htmlFor="scheduleTime">Hora do Agendamento</label><br/>
-          <input id="scheduleTime" type="time" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} style={{ padding: '8px' }} />
+          {/* --- MUDANÇA PRINCIPAL AQUI --- */}
+          <select 
+            id="scheduleTime" 
+            value={scheduleTime} 
+            onChange={(e) => setScheduleTime(e.target.value)} 
+            style={{ padding: '8px', minWidth: '120px' }}
+          >
+            <option value="" disabled>Selecione a hora</option>
+            {timeSlots.map(time => (
+              <option key={time} value={time}>{time}</option>
+            ))}
+          </select>
         </div>
       </div>
       <div>
