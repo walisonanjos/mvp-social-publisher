@@ -42,7 +42,9 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Minha Plataforma de Posts</h1>
+      <h1 className="text-3xl font-bold text-blue-600 underline">
+  Minha Plataforma de Posts
+</h1>
       {!session ? (
         <Auth />
       ) : (
