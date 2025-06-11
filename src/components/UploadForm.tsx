@@ -2,7 +2,6 @@
 
 'use client';
 
-// NOVIDADE 1: Importar o useRef
 import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabaseClient';
 
@@ -28,8 +27,6 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
   const [scheduleTime, setScheduleTime] = useState('');
   const [socialTargets, setSocialTargets] = useState(initialTargets);
   const [isLoading, setIsLoading] = useState(false);
-
-  // NOVIDADE 2: Criar a referência para o nosso input de arquivo
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supabase = createClient();
@@ -89,18 +86,26 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
 
     } catch (error) {
       console.error('Erro no processo de agendamento:', error);
-      alert('Ocorreu um erro: ' + (error as Error).message);
+      const errorMessage = (error as Error).message;
+
+      // --- MUDANÇA PRINCIPAL AQUI ---
+      // Checa se o erro é o de duplicidade que acabamos de criar
+      if (errorMessage.includes('unique_user_schedule')) {
+        alert('Erro: Você já possui um agendamento para este mesmo dia e horário. Por favor, escolha outro horário.');
+      } else {
+        // Mantém o alerta genérico para outros tipos de erro
+        alert('Ocorreu um erro: ' + errorMessage);
+      }
+      // --- FIM DA MUDANÇA ---
+
     } finally {
       setIsLoading(false);
-      // Limpa o formulário
       setFile(null);
       setTitle('');
       setDescription('');
       setScheduleDate('');
       setScheduleTime('');
       setSocialTargets(initialTargets);
-
-      // NOVIDADE 3: Limpar o input de arquivo diretamente
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -111,7 +116,6 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
       <div>
         <label>Vídeo</label><br/>
-        {/* Adicionamos a 'ref' ao input */}
         <input type="file" accept="video/*" onChange={handleFileChange} disabled={isLoading} ref={fileInputRef} />
       </div>
       <div>
