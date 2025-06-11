@@ -2,7 +2,8 @@
 
 'use client';
 
-import { useState } from 'react';
+// NOVIDADE 1: Importar o useRef
+import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabaseClient';
 
 type UploadFormProps = {
@@ -17,8 +18,6 @@ const initialTargets = {
   kwai: false,
 };
 
-// --- MUDANÇA PRINCIPAL AQUI ---
-// Definimos os horários fixos
 const timeSlots = ['09:00', '11:00', '13:00', '15:00', '17:00'];
 
 export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
@@ -26,9 +25,12 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [scheduleDate, setScheduleDate] = useState('');
-  const [scheduleTime, setScheduleTime] = useState(''); // O estado continua o mesmo
+  const [scheduleTime, setScheduleTime] = useState('');
   const [socialTargets, setSocialTargets] = useState(initialTargets);
   const [isLoading, setIsLoading] = useState(false);
+
+  // NOVIDADE 2: Criar a referência para o nosso input de arquivo
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supabase = createClient();
   const UPLOAD_PRESET = 'zupltfoo';
@@ -90,12 +92,18 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
       alert('Ocorreu um erro: ' + (error as Error).message);
     } finally {
       setIsLoading(false);
+      // Limpa o formulário
       setFile(null);
       setTitle('');
       setDescription('');
       setScheduleDate('');
       setScheduleTime('');
       setSocialTargets(initialTargets);
+
+      // NOVIDADE 3: Limpar o input de arquivo diretamente
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -103,7 +111,8 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
       <div>
         <label>Vídeo</label><br/>
-        <input type="file" accept="video/*" onChange={handleFileChange} disabled={isLoading} />
+        {/* Adicionamos a 'ref' ao input */}
+        <input type="file" accept="video/*" onChange={handleFileChange} disabled={isLoading} ref={fileInputRef} />
       </div>
       <div>
         <label htmlFor="title">Título</label><br/>
@@ -120,7 +129,6 @@ export default function UploadForm({ onUploadSuccess }: UploadFormProps) {
         </div>
         <div>
           <label htmlFor="scheduleTime">Hora do Agendamento</label><br/>
-          {/* --- MUDANÇA PRINCIPAL AQUI --- */}
           <select 
             id="scheduleTime" 
             value={scheduleTime} 
